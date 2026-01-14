@@ -1,5 +1,5 @@
-const { extractPDFText } = require("./src/utils/pdfLoader");
-const { splitText } = require("./src/utils/textSplitter");
+const { extractPDFText } = require("../src/utils/pdfLoader");
+const { splitText } = require("../src/utils/textSplitter");
 
 async function test() {
   const text = await extractPDFText("./sample.pdf");

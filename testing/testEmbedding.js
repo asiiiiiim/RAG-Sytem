@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 
-const { embedText } = require("./src/embeddings/embedder");
+const { embedText } = require("../src/embeddings/embedder");
 
 async function test() {
   const docVec = await embedText("This is a document chunk about RAG and embeddings.", {

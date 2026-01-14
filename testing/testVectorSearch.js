@@ -1,9 +1,9 @@
 require("dotenv").config();
 
-const { extractPDFText } = require("./src/utils/pdfLoader");
-const { splitText } = require("./src/utils/textSplitter");
-const { embedText } = require("./src/embeddings/embedder");
-const { InMemoryVectorStore } = require("./src/vectorstore/inMemoryStore");
+const { extractPDFText } = require("../src/utils/pdfLoader");
+const { splitText } = require("../src/utils/textSplitter");
+const { embedText } = require("../src/embeddings/embedder");
+const { InMemoryVectorStore } = require("../src/vectorstore/inMemoryStore");
 
 async function main() {
   const store = new InMemoryVectorStore();
