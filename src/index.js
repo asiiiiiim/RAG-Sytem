@@ -7,6 +7,11 @@ const fs = require("fs");
 
 const { runRAGGraph } = require("./graph/ragGraph");
 
+const { addDocument, getDocument, listDocuments } = require("./store/registry");
+const { extractPDFText } = require("./utils/pdfLoader");
+const { splitText } = require("./utils/textSplitter");
+const { embedText } = require("./embeddings/embedder");
+
 const app = express();
 app.use(express.json());
 
@@ -21,6 +26,62 @@ app.get("/", (req, res) => {
   res.json({ status: "ok", message: "RAG server running" });
 });
 
+app.get("/documents", (req, res) => {
+  return res.json({ documents: listDocuments() });
+});
+
+app.post("/documents", upload.array("files"), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "at least one PDF file is required" });
+    }
+
+    const created = [];
+
+    for (const file of req.files) {
+      const fileName = file.originalname || file.filename;
+      const pdfPath = file.path;
+
+      // 1) Extract text
+      const text = await extractPDFText(pdfPath);
+
+      // 2) Chunk
+      const chunks = splitText(text, { chunkSize: 1200, chunkOverlap: 200 });
+
+      // 3) Register doc
+      const preview = (chunks[0] || "").slice(0, 200);
+      const documentId = addDocument({
+        fileName,
+        pdfPath,
+        preview,
+        chunksCount: chunks.length,
+      });
+
+      // 4) Embed chunks + store in that doc’s vector store
+      const doc = getDocument(documentId);
+      for (let i = 0; i < chunks.length; i++) {
+        const emb = await embedText(chunks[i], { taskType: "search_document" });
+
+        doc.store.add({
+          id: `${documentId}_chunk${i}`,
+          text: chunks[i],
+          embedding: emb,
+          metadata: { documentId, chunkIndex: i, fileName },
+        });
+      }
+
+      created.push(doc.meta);
+    }
+
+    return res.json({ documents: created });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message || "Internal error" });
+  }
+});
+
 /**
  * POST /ask
  * Form-data:
@@ -28,30 +89,63 @@ app.get("/", (req, res) => {
  *  - question: string
  *  - topK: number (optional)
  */
-app.post("/ask", upload.array("files"), async (req, res) => {
+app.post("/ask", async (req, res) => {
   try {
-    const question = req.body.question;
-    const topK = Number(req.body.topK || 3);
+    const { question, documentIds, topK = 3 } = req.body;
 
-    if (!question) {
+    if (!question)
       return res.status(400).json({ error: "question is required" });
-    }
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: "at least one PDF file is required" });
+    if (
+      !documentIds ||
+      !Array.isArray(documentIds) ||
+      documentIds.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ error: "documentIds must be a non-empty array" });
     }
 
-    const pdfPaths = req.files.map((f) => f.path);
+    // 1) Embed query
+    const qEmb = await embedText(question, { taskType: "search_query" });
 
-    const result = await runRAGGraph({
+    // 2) Search across selected documents
+    const allResults = [];
+    for (const docId of documentIds) {
+      const doc = getDocument(docId);
+      if (!doc) continue;
+
+      const results = doc.store.similaritySearch(qEmb, topK);
+      allResults.push(...results);
+    }
+
+    if (allResults.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No documents found for given documentIds" });
+    }
+
+    // 3) Sort results globally and take topK
+    allResults.sort((a, b) => b.score - a.score);
+    const retrieved = allResults.slice(0, topK);
+
+    // 4) Generate answer
+    const { generateAnswer } = require("./graph/nodes/generateNode");
+    const answer = await generateAnswer({
       question,
-      pdfPaths,
-      topK,
+      retrievedResults: retrieved,
     });
 
-    return res.json({
-      answer: result.answer,
-      sources: result.sources,
-    });
+    // 5) Build sources
+    const sources = retrieved.map((r, i) => ({
+      source: i + 1,
+      documentId: r.metadata.documentId,
+      fileName: r.metadata.fileName,
+      chunkIndex: r.metadata.chunkIndex,
+      score: Number(r.score.toFixed(4)),
+      snippet: r.text.slice(0, 180) + (r.text.length > 180 ? "..." : ""),
+    }));
+
+    return res.json({ answer, sources });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: err.message || "Internal error" });
@@ -59,4 +153,6 @@ app.post("/ask", upload.array("files"), async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`Server running on http://localhost:${PORT}`)
+);

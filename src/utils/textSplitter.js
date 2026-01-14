@@ -10,7 +10,11 @@
 function splitText(text, { chunkSize = 1200, chunkOverlap = 200 } = {}) {
   if (!text || typeof text !== "string") return [];
 
-  const cleaned = text.replace(/\s+/g, " ").trim();
+  const cleaned = text
+  .replace(/\s+/g, " ")
+  .replace(/\.{5,}/g, " ")   // remove long dot runs
+  .trim();
+
   if (!cleaned) return [];
 
   if (chunkOverlap >= chunkSize) {
