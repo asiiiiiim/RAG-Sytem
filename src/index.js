@@ -5,12 +5,17 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const { runRAGGraph } = require("./graph/ragGraph");
+// const { runRAGGraph } = require("./graph/ragGraph");
 
 const { addDocument, getDocument, listDocuments } = require("./store/registry");
 const { extractPDFText } = require("./utils/pdfLoader");
 const { splitText } = require("./utils/textSplitter");
 const { embedText } = require("./embeddings/embedder");
+const { askQuestion } = require("./services/askService");
+
+const { retrieveWithRouting } = require("./retrieval/retrievePipeline");
+const { generateGroundedAnswer } = require("./llm/generateAnswer");
+const { ensureDbInitialized } = require("./db/mongo");
 
 const app = express();
 app.use(express.json());
@@ -75,7 +80,7 @@ app.post("/documents", upload.array("files"), async (req, res) => {
       created.push(doc.meta);
     }
 
-    return res.json({ documents: created });
+    return res.json({ mode: "legacy-in-memory", documents: created });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: err.message || "Internal error" });
@@ -83,74 +88,135 @@ app.post("/documents", upload.array("files"), async (req, res) => {
 });
 
 /**
+ * old version - per-document retrieval from in-memory storage
  * POST /ask
  * Form-data:
  *  - files: PDFs (multiple)
  *  - question: string
  *  - topK: number (optional)
  */
+// app.post("/ask", async (req, res) => {
+//   try {
+//     const { question, documentIds, topK = 3 } = req.body;
+
+//     if (!question)
+//       return res.status(400).json({ error: "question is required" });
+//     if (
+//       !documentIds ||
+//       !Array.isArray(documentIds) ||
+//       documentIds.length === 0
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ error: "documentIds must be a non-empty array" });
+//     }
+
+//     // 1) Embed query
+//     const qEmb = await embedText(question, { taskType: "search_query" });
+
+//     // 2) Search across selected documents
+//     const allResults = [];
+//     for (const docId of documentIds) {
+//       const doc = getDocument(docId);
+//       if (!doc) continue;
+
+//       const results = doc.store.similaritySearch(qEmb, topK);
+//       allResults.push(...results);
+//     }
+
+//     if (allResults.length === 0) {
+//       return res
+//         .status(404)
+//         .json({ error: "No documents found for given documentIds" });
+//     }
+
+//     // 3) Sort results globally and take topK
+//     allResults.sort((a, b) => b.score - a.score);
+//     const retrieved = allResults.slice(0, topK);
+
+//     // 4) Generate answer
+//     const { generateAnswer } = require("./graph/nodes/generateNode");
+//     const answer = await generateAnswer({
+//       question,
+//       retrievedResults: retrieved,
+//     });
+
+//     // 5) Build sources
+//     const sources = retrieved.map((r, i) => ({
+//       source: i + 1,
+//       documentId: r.metadata.documentId,
+//       fileName: r.metadata.fileName,
+//       chunkIndex: r.metadata.chunkIndex,
+//       score: Number(r.score.toFixed(4)),
+//       snippet: r.text.slice(0, 180) + (r.text.length > 180 ? "..." : ""),
+//     }));
+
+//     return res.json({ answer, sources });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ error: err.message || "Internal error" });
+//   }
+// });
+
+/** 
+ * new version - RAG with routing graph gets data and routes from mongo/vector store
+ * POST /ask
+ * Body (JSON):
+ *  - question: string
+ *  - topK: number (optional)
+ */
 app.post("/ask", async (req, res) => {
   try {
-    const { question, documentIds, topK = 3 } = req.body;
+    const { question, topK = 6 } = req.body;
 
-    if (!question)
+    if (!question || typeof question !== "string" || !question.trim()) {
       return res.status(400).json({ error: "question is required" });
-    if (
-      !documentIds ||
-      !Array.isArray(documentIds) ||
-      documentIds.length === 0
-    ) {
-      return res
-        .status(400)
-        .json({ error: "documentIds must be a non-empty array" });
+    }
+    // Guard: ensure we have indexed chunks
+    const c = await ensureDbInitialized();
+    const chunksCount = await c.chunks.countDocuments();
+    if (chunksCount === 0) {
+      return res.status(400).json({
+        error: "No indexed chunks found. Run `npm run migrate` first to scan folders and index PDFs.",
+      });
     }
 
-    // 1) Embed query
-    const qEmb = await embedText(question, { taskType: "search_query" });
 
-    // 2) Search across selected documents
-    const allResults = [];
-    for (const docId of documentIds) {
-      const doc = getDocument(docId);
-      if (!doc) continue;
-
-      const results = doc.store.similaritySearch(qEmb, topK);
-      allResults.push(...results);
-    }
-
-    if (allResults.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No documents found for given documentIds" });
-    }
-
-    // 3) Sort results globally and take topK
-    allResults.sort((a, b) => b.score - a.score);
-    const retrieved = allResults.slice(0, topK);
-
-    // 4) Generate answer
-    const { generateAnswer } = require("./graph/nodes/generateNode");
-    const answer = await generateAnswer({
-      question,
-      retrievedResults: retrieved,
+    // 1) Route + retrieve (scoped, quota, common probe, context pack)
+    const retrieval = await retrieveWithRouting({
+      question: question.trim(),
+      topKFinal: Number(topK) || 6,
+      candidateK: 8,
+      finalMaxScopes: 3,
+      commonThreshold: 0.56,
+      commonRatio: 0.33,
+      commonHardCap: 2,
     });
 
-    // 5) Build sources
-    const sources = retrieved.map((r, i) => ({
-      source: i + 1,
-      documentId: r.metadata.documentId,
-      fileName: r.metadata.fileName,
-      chunkIndex: r.metadata.chunkIndex,
-      score: Number(r.score.toFixed(4)),
-      snippet: r.text.slice(0, 180) + (r.text.length > 180 ? "..." : ""),
-    }));
+    // 2) Generate grounded answer
+    const answer = await generateGroundedAnswer({
+      question: question.trim(),
+      context: retrieval.context,
+    });
 
-    return res.json({ answer, sources });
+    // 3) Return answer + sources + debug info (helpful for mentor)
+    return res.json({
+      answer,
+      sources: retrieval.sources,
+      routing: {
+        selectedScopes: retrieval.routing.selectedScopes,
+        // candidates: retrieval.routing.candidates?.slice(0, 8), // optional, debug
+        notes: retrieval.routing.notes,
+      },
+      quota: retrieval.quota,
+      commonDecision: retrieval.commonDecision,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("ASK error:", err);
     return res.status(500).json({ error: err.message || "Internal error" });
   }
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
