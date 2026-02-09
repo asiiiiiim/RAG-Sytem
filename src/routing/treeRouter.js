@@ -7,10 +7,22 @@ const { ensureDbInitialized } = require("../db/mongo");
  * Cosine similarity between two vectors
  */
 function cosineSim(a, b) {
-  let dot = 0, na = 0, nb = 0;
-  const n = Math.min(a.length, b.length);
-  for (let i = 0; i < n; i++) {
-    const x = a[i], y = b[i];
+  // Validate embeddings exist and have compatible dimensions
+  if (!a || !b || !Array.isArray(a) || !Array.isArray(b)) {
+    return 0;
+  }
+
+  if (a.length !== b.length) {
+    console.warn(`Embedding dimension mismatch: ${a.length} vs ${b.length}`);
+    return 0;
+  }
+
+  let dot = 0,
+    na = 0,
+    nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i],
+      y = b[i];
     dot += x * y;
     na += x * x;
     nb += y * y;
@@ -38,17 +50,27 @@ function safeParseJson(text) {
  * 1) Embedding top-K candidate folders
  * 2) LLM chooses final 1-3 scopes from those candidates
  */
-async function selectScopes(question, { candidateK = 8, finalMaxScopes = 3 } = {}) {
+async function selectScopes(
+  question,
+  { candidateK = 8, finalMaxScopes = 3 } = {},
+) {
   const c = await ensureDbInitialized();
 
   // 1) Embed question for routing
   const qVec = await embedText(question, { taskType: "search_query" });
 
+  if (!qVec || !Array.isArray(qVec)) {
+    throw new Error(`Failed to embed question: received invalid embedding`);
+  }
+
   // 2) Load folder nodes with embeddings
   const folders = await c.tree_nodes
     .find(
-      { nodeType: "folder", readmeEmbedding: { $exists: true, $type: "array" } },
-      { projection: { relPath: 1, routingText: 1, readmeEmbedding: 1 } }
+      {
+        nodeType: "folder",
+        readmeEmbedding: { $exists: true, $type: "array" },
+      },
+      { projection: { relPath: 1, routingText: 1, readmeEmbedding: 1 } },
     )
     .toArray();
 
@@ -99,7 +121,10 @@ async function selectScopes(question, { candidateK = 8, finalMaxScopes = 3 } = {
   // const candidatesForLLM = finalCandidates.slice(0, candidateK);
 
   // 4) LLM decides final scopes (1-3)
-  const { system, user } = buildRouterMessages({ question, candidates: scored });
+  const { system, user } = buildRouterMessages({
+    question,
+    candidates: scored,
+  });
 
   let llmText = "";
   try {
@@ -114,14 +139,18 @@ async function selectScopes(question, { candidateK = 8, finalMaxScopes = 3 } = {
 
     const parsed = safeParseJson(llmText);
 
-    let selectedScopes = Array.isArray(parsed.selectedScopes) ? parsed.selectedScopes : [];
+    let selectedScopes = Array.isArray(parsed.selectedScopes)
+      ? parsed.selectedScopes
+      : [];
     selectedScopes = selectedScopes
       .map((s) => (typeof s === "string" ? s.trim() : ""))
       .filter(Boolean);
 
     // enforce: must be from candidates and limit size
     const allowed = new Set(scored.map((x) => x.relPath));
-    selectedScopes = selectedScopes.filter((s) => allowed.has(s)).slice(0, finalMaxScopes);
+    selectedScopes = selectedScopes
+      .filter((s) => allowed.has(s))
+      .slice(0, finalMaxScopes);
 
     // fallback if empty
     if (!selectedScopes.length) {

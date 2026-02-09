@@ -9,21 +9,31 @@ function getDbName() {
 }
 
 async function connectMongo() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) throw new Error("MONGODB_URI is missing in .env");
+  if (db)
+    return db; // already connected
+  else {
+    const uri = process.env.MONGODB_URI;
+    if (!uri) throw new Error("MONGODB_URI is missing in .env");
 
-  if (!client) {
-    client = new MongoClient(uri);
-    await client.connect();
+    if (!client) {
+      client = new MongoClient(uri);
+      await client.connect();
+    }
+
+    db = client.db(getDbName());
+    return db;
   }
+}
 
-  db = client.db(getDbName());
+function getDb() {
+  if (!db) throw new Error("Mongo not connected. Call connectMongo() first.");
   return db;
 }
 
 function collections() {
   if (!_collections) {
-    if (!db) throw new Error("Mongo not connected yet. Call connectMongo() first.");
+    if (!db)
+      throw new Error("Mongo not connected yet. Call connectMongo() first.");
     _collections = {
       meta: db.collection("meta"),
       tree_nodes: db.collection("tree_nodes"),
@@ -54,7 +64,7 @@ async function ensureDbInitialized() {
         lastInitAt: new Date(),
       },
     },
-    { upsert: true }
+    { upsert: true },
   );
 
   // 2) Indexes (safe to run repeatedly)
@@ -79,6 +89,8 @@ async function closeMongo() {
 
 module.exports = {
   connectMongo,
+  getDb,
+  getDbName,
   collections,
   ensureDbInitialized,
   closeMongo,
