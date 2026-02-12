@@ -3,7 +3,6 @@ node_modules/
 
 # Environment
 .env
-.env.*
 
 # Web crawler auth/session
 storageState.web.json
@@ -11,6 +10,13 @@ storageState.web.json
 # Crawl/debug output
 storage/
 logs/
+screenshots/
+uploads/
+
+# Debug artifacts
+*.png
+discover_fail_*.png
 
 # OS junk
 .DS_Store
+Thumbs.db

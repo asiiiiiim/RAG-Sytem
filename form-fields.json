@@ -1,0 +1,92 @@
+{
+  "$schema": "./form-fields.schema.json",
+  "version": "1.0",
+  "description": "Form field configurations for Playwright to fill when visiting specific pages",
+  
+  "defaults": {
+    "customerId": "10",
+    "dateFrom": "01-01-2024",
+    "dateTo": "12-02-2026",
+    "waitAfterSubmit": 3000
+  },
+
+  "commonSelectors": {
+    "customerId": "input[name='customerId'], input[name='customer_id'], input[id='customerId'], input[name*='customer']",
+    "dateFrom": "input[name='dateFrom'], input[name='date_from'], input[name='fromDate'], input[id='dateFrom'], input[name*='from_date']",
+    "dateTo": "input[name='dateTo'], input[name='date_to'], input[name='toDate'], input[id='dateTo'], input[name*='to_date']",
+    "submit": "button[type='submit'], input[type='submit'], input[value='Show'], input[value='Search'], input[value='Generate'], button:has-text('Show'), button:has-text('Search')"
+  },
+  
+  "pages": {
+    "statement_of_account_performance": {
+      "urlPattern": "/brokers/statement_of_account_performance.php",
+      "description": "Statement of Account Performance report",
+      "fields": [
+        {
+          "label": "Customer ID",
+          "selector": "input[name='customerId'], input[name='customer_id'], input[id='customerId'], #customerId, input[name*='customer'], input[id*='customer']",
+          "value": "10",
+          "type": "text"
+        },
+        {
+          "label": "Date From",
+          "selector": "input[name='dateFrom'], input[name='date_from'], input[name='fromDate'], input[id='dateFrom'], #dateFrom, input[name*='from_date'], input[name*='fromdate']",
+          "value": "01-01-2024",
+          "type": "date"
+        },
+        {
+          "label": "Date To",
+          "selector": "input[name='dateTo'], input[name='date_to'], input[name='toDate'], input[id='dateTo'], #dateTo, input[name*='to_date'], input[name*='todate']",
+          "value": "12-02-2026",
+          "type": "date"
+        }
+      ],
+      "submitSelector": "button[type='submit'], input[type='submit'], input[value='Show'], input[value='Search'], input[value='Generate'], button:has-text('Show'), button:has-text('Search'), button:has-text('Generate')",
+      "waitAfterSubmit": 3000
+    },
+
+    "accounts_balances": {
+      "urlPattern": "/brokers/accounts_balances.php",
+      "description": "Accounts Balances report",
+      "fields": [
+        {
+          "label": "Customer ID",
+          "selector": "input[name='customerId'], input[name='customer_id'], input[id='customerId'], input[name*='customer']",
+          "value": "10",
+          "type": "text"
+        }
+      ],
+      "submitSelector": "button[type='submit'], input[type='submit'], input[value='Show'], input[value='Search']",
+      "waitAfterSubmit": 3000
+    },
+
+    "active_orders_report": {
+      "urlPattern": "/brokers/active_orders_report",
+      "description": "Active Orders Report",
+      "fields": [
+        {
+          "label": "Customer ID",
+          "selector": "input[name='customerId'], input[name='customer_id'], input[name*='customer']",
+          "value": "10",
+          "type": "text"
+        },
+        {
+          "label": "Date From",
+          "selector": "input[name='dateFrom'], input[name='date_from'], input[name*='from']",
+          "value": "01-01-2024",
+          "type": "date"
+        },
+        {
+          "label": "Date To",
+          "selector": "input[name='dateTo'], input[name='date_to'], input[name*='to']",
+          "value": "12-02-2026",
+          "type": "date"
+        }
+      ],
+      "submitSelector": "button[type='submit'], input[type='submit'], input[value='Show'], input[value='Search']",
+      "waitAfterSubmit": 3000
+    }
+  },
+
+  "_comment": "Add more pages here. The urlPattern is matched case-insensitively against the full URL."
+}

@@ -1,0 +1,278 @@
+[
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/account_closing.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/account_settings.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/accounting_post_transactions.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/accounts_balances.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/accounts_suspicions.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/accrued_interest_manager2.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/active_orders_import_tool.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/active_orders_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/active_orders_reports.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/addMarket.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/advanced_customers_risk_assessment.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/advanced_risk_classification_settings_action.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/agreement_requests.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/ai_reports.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/annual_portfolio_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/api_csrf_allowed_domains.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/approve_reject_transactions.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/approve_reject_transactions.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/asset_summary_on_groups_level.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/asset_summary.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/asset_summary.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/asset_summary3.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/asset_summary3.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/attribution_analysis_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/audit_trail.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/balance_comparison.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/balance_flow_new.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/balance_sheet.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/bank_accounts_setup.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/bank_details.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/bank_reconciliation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/banks_breakdown.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/black_list_customers.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/bloomberg_trades_format.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/bonds_custody_fees_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/book_unrealized_pl.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/borrowers_dashboard.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/borrowing_returning_transactions.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/broker_financial_settlement.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/broker_trades_settlement.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/brokers_request_permission.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/brokers_trading_limit.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/call_recording.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cancel_completed_trades.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/capital_adequacy_setup.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/capital_adequacy.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cash_flow_and_trades.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cash_inventory_management.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cash_overdraft_upload.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/cash_overdraft_upload.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cash_reservation_request_pdf.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cash_reservation_request.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cash_reservation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/cash_reservation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cfd_end_of_day_settlement.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cfd_initial_margin.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/change_password.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/change_password.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/check_db_consistency.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/check_printer.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cheque_reconciliation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_broker_transaction.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_cash_holdings.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_custody_reconciliation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_groups_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_messages.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/client_messages.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_money_custody.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_open_orders_dashboard.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_performance_breakdown.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_performance_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/client_reconciliation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/clients_confirmation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/clients_confirmation.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/clients_open_positions.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/clients_reports.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/close_non_equity_position.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/Brokers/close_non_equity_position.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/cma_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/coa_balances.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/coa_pdf.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/coa_requests.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/coa.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/complex_exchange_rates.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/compliance_watchlist_report.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/countries.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/create_reconciliation_import.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/create_trade_log.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/credit_interest.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/system_preferences.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/statement_of_account_performance.php"
+  },
+  {
+    "routeKey": "zag.dev.ae.zagfn.com/brokers/customer_account_deletion_requests.php"
+  }
+]

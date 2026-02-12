@@ -1,23 +1,37 @@
 {
   "name": "rag-system",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "node src/scripts/migrate.js"
+  "version": "2.0.0",
+  "description": "Web crawler and RAG system for extracting data from web applications",
+  "main": "src/web/crawler.js",
+  "bin": {
+    "crawl": "src/web/cli.js"
   },
-  "keywords": [],
+  "scripts": {
+    "crawl": "node src/web/cli.js",
+    "crawl:url": "node src/web/cli.js --url",
+    "crawl:all": "node src/web/cli.js --all",
+    "crawl:pattern": "node src/web/cli.js --pattern",
+    "migrate": "node src/scripts/migrate.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web-crawler",
+    "rag",
+    "playwright",
+    "mongodb",
+    "form-filling"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "dotenv": "^17.2.3",
+    "crawlee": "^3.16.0",
+    "dotenv": "^17.2.4",
     "express": "^5.2.1",
-    "html-to-text": "^9.0.5",
-    "langchain": "^1.2.7",
+    "mongodb": "^6.0.0",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
-    "pdf-parse": "^1.1.1"
+    "pdf-parse": "^1.1.1",
+    "playwright": "^1.58.2"
   }
 }

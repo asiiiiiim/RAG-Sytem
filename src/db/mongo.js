@@ -1,4 +1,4 @@
-const { MongoClient } = require("mongodb");
+const { MongoClient, GridFSBucket } = require("mongodb");
 
 let client;
 let db;
@@ -6,6 +6,11 @@ let _collections = null;
 
 function getDbName() {
   return process.env.DB_NAME || "rag_tree";
+}
+
+function getGridFSBucket(bucketName = "web_screens") {
+  if (!db) throw new Error("Mongo not connected yet. Call connectMongo() first.");
+  return new GridFSBucket(db, { bucketName });
 }
 
 async function connectMongo() {
@@ -32,6 +37,15 @@ function collections() {
     };
   }
   return _collections;
+}
+
+function webCollections() {
+  if (!db) throw new Error("Mongo not connected yet. Call connectMongo() first.");
+  return {
+    web_pages: db.collection("web_pages"),
+    web_chunks: db.collection("web_chunks"),
+    web_failures: db.collection("web_failures"),
+  };
 }
 
 /**
@@ -81,5 +95,7 @@ module.exports = {
   connectMongo,
   collections,
   ensureDbInitialized,
+  getGridFSBucket,
   closeMongo,
+  webCollections,
 };
